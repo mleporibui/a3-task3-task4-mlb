@@ -1,0 +1,134 @@
+---
+title: "a3_task3_michelle_leporibui"
+author: "Michelle Lepori-Bui"
+date: "11/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(kableExtra)
+library(lubridate)
+library(here)
+```
+```{r}
+urchins <- read_csv(here("data","urchins.csv"))
+```
+
+Section 1: size comparison, purple and red urchins
+include data from all sites and for both treatments
+ie ignore those variables in this exploration
+
+i. exploratory data visualization
+compare districution of sizes between purple and rd urchins using the graph types below 
+these are exploratory not final so they dont need to be perfect and dont add fig captions but at least update axis labels
+- faceted histogram (hint geom_histogram then facet_wrap (~common_name)
+- boxplot (geom_boxplot) with common name on the x axis and size on the y axis
+
+```{r}
+urchins_clean <- urchins %>% 
+  clean_names()
+ggplot(data = urchins_clean, aes(x = size)) +
+  geom_histogram() +
+  facet_wrap(~common_name) +
+  labs (x = "diameter (cm)", y = "number of urchins")
+
+ggplot(data = urchins_clean, aes(x = common_name, y = size)) +
+  geom_boxplot() +
+  labs( x =  "urchin species", y = "diameter (cm)")
+  
+```
+
+
+ii. descriptive statistics table
+create a summary table that contains the following statistics for purple abd red urchins (still ignoring site as a variable): 
+mean
+median
+std dev
+sample size
+kableExtra to make it nicer 
+hint: group_by() %>% summarize(mean,median,sd,n)
+
+```{r}
+urchins_summary <- urchins_clean %>% 
+  group_by(common_name) %>% 
+  summarize(urch_mean = mean(size),
+            urch_med = median(size),
+            urch_se = sd(size),
+            urch_n = n())
+  
+urchins_summary %>% 
+  kable(col.names = c("species", "mean", "median", "standard deviation", "sample size"))
+```
+
+## 2 - 3 sentences here
+
+ii. below where your exploratory graphs and table appear add 2 -3  sentences briefly describing your overall takeaways about how the size (ditributinm centrat tendency, spread, etc ) compare between the two spps of urchins 
+contextualize any differences you observe - for example, what is the actuak and % differene in mean urchin diameter betewen the spps?
+
+Sectiom 2. explore purple urchin counts by site and year
+i. in a piped sequence create stored subset of the urchins data called purple_urchins in which you
+filter( spps = purple)
+convert date to date class
+mutate new cokumn only year
+new column called site_full that contaisn the full name not abbrev for each of the 5 sites:
+Naples Reef
+Arroyo Quemado Reef
+Carpinteria REef
+Mohawk REed
+Isla Vista REed
+hint case_when()
+
+```{r}
+purple_urchins <- urchins_clean %>% 
+  filter(common_name == "Purple Urchin") %>% 
+  mutate(date = mdy(date)) %>% 
+  mutate(year = year(date)) %>% 
+  mutate(site_full = case_when(
+    site == "NAPL" ~ "Naples Reef",
+    site == "AQUE" ~ "Arroyo Quemado Reef",
+    site == "CARP" ~ "Carpinteria Reef",
+    site == "MOHK" ~ "Mohawk Reef",
+    site == "IVEE" ~ "Isla Vista Reef"
+  ))
+```
+
+
+ii. summary table containing the total number of purple urchins observed by site and year 
+starting from purple urchins and using count() function to find counts of obs by group
+no need to finalize this table just use output in plot in next step
+
+```{r}
+purple_urchins_summary <- purple_urchins %>% 
+  group_by(site, year) %>% 
+  summarize(count = n()) 
+purple_urchins_summary
+```
+
+
+iii. make an exploratory graph of counts of purple urchins recorded at each site over time for the years included inthe study not finalized
+
+```{r}
+ggplot(data = purple_urchins_summary, aes(x = year, y = count)) +
+  geom_col(aes(fill = site)) +
+  facet_wrap(~site)
+```
+
+
+iv. save and knit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
