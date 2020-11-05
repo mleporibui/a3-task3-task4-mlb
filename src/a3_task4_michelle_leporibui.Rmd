@@ -1,0 +1,68 @@
+---
+title: "a3_task4_michelle_leporibui"
+author: "Michelle Lepori-Bui"
+date: "11/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(kableExtra)
+library(lubridate)
+library(here)
+```
+```{r}
+urchins <- read_csv(here("data","urchins.csv"))
+```
+
+```{r}
+pu_napl_2010 <- urchins %>% 
+  clean_names() %>% 
+  mutate(date = myd(date)) %>% 
+  mutate(year = year(date)) %>% 
+  filter(common_name == "Purple Urchin" &
+           year == 2010 &
+           site == "NAPL")
+```
+
+```{r}
+ggplot(data = pu_napl_2010, aes(x = size)) +
+  geom_histogram() +
+  facet_wrap (~treatment)
+
+ggplot(data = pu_napl_2010, aes(sample = size)) +
+  geom_qq() +
+  facet_wrap(~treatment)
+```
+
+```{r}
+pu_napl_2010_summary <- pu_napl_2010 %>% 
+  group_by(treatment) %>% 
+  summarize(pu_mean = mean(size),
+            pu_median = median(size),
+            pu_sd = sd(size),
+            pu_count = n())
+pu_napl_2010_summary
+```
+
+### 2 sample t-test
+```{r}
+
+annual_sample <- pu_napl_2010 %>% 
+  filter(treatment == "ANNUAL") %>% 
+  pull(size)
+
+control_sample <- pu_napl_2010 %>% 
+  filter(treatment == "CONTROL") %>% 
+  pull(size)
+ 
+t.test(x = annual_sample, y = control_sample)
+```
+
+
+
+
+
+
