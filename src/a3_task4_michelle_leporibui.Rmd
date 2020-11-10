@@ -25,15 +25,15 @@ In this report, we explore purple urchins sampled at Naples Reef in January of 2
 First, we convert column names and dates to be easier to work with. We also extract year and month data from the full reported sample date, and filter to only look at the set of data we want, Purple Urchins, at Naples Reef, from January 2010. 
 
 ```{r message=FALSE, warning=FALSE}
-pu_napl_jan2010 <- urchins %>% 
-  clean_names() %>% 
-  mutate(date = mdy(date)) %>% 
-  mutate(year = year(date)) %>% 
-  mutate(month = month(date)) %>% 
+pu_napl_jan2010 <- urchins %>% # create new data frame
+  clean_names() %>% # clean column names
+  mutate(date = mdy(date)) %>% # change date format
+  mutate(year = year(date)) %>% # create new year column
+  mutate(month = month(date)) %>% # create new month column
   filter(common_name == "Purple Urchin" &
            year == 2010 &
            month == 1 &
-           site == "NAPL")
+           site == "NAPL") # filter for species, year, month, and site
 ```
 
 ### Data visualization
@@ -41,10 +41,11 @@ pu_napl_jan2010 <- urchins %>%
 Next, we explore the raw data by visualizing it as histogram and quantile-quantile plots. Splitting the data by treatment allows us to compare the two treatments side-by-side.
 
 ```{r message=FALSE, warning=FALSE}
+# histogram to see distribution of urchin sizes
 ggplot(data = pu_napl_jan2010, aes(x = size)) +
   geom_histogram() +
   facet_wrap (~treatment)
-
+# quantile-qquantile plots to assess normality
 ggplot(data = pu_napl_jan2010, aes(sample = size)) +
   geom_qq() +
   facet_wrap(~treatment)
@@ -57,21 +58,21 @@ The quantile-quantile plots look relatively linear, which indicates that our dat
 Next, we can calculate some summary statistics for this data and organize it into a table. 
 
 ```{r message=FALSE, warning=FALSE}
-pu_napl_jan2010_summary <- pu_napl_jan2010 %>% 
-  group_by(treatment) %>% 
-  summarize(pu_mean = mean(size),
+pu_napl_jan2010_summary <- pu_napl_jan2010 %>% # create summary table
+  group_by(treatment) %>%  # group by treatment
+  summarize(pu_mean = mean(size), #calculate and add mean, median, standard deviation, and counts to summary table
             pu_median = median(size),
             pu_sd = sd(size),
             pu_count = n())
-pu_napl_jan2010_summary
+pu_napl_jan2010_summary # show summary table
 ```
 
-Our sample sizes are larger than 30 so we can perform a 2 sample t-test. 
+Our sample sizes are larger than 30 so we can perform a 2-sample t-test. 
 
 ### 2-sample t-test
 
 ```{r message=FALSE, warning=FALSE}
-
+# create vectors of sizes from annual and control treatments to use in t-tes
 annual_sample <- pu_napl_jan2010 %>% 
   filter(treatment == "ANNUAL") %>% 
   pull(size)
@@ -80,10 +81,14 @@ control_sample <- pu_napl_jan2010 %>%
   filter(treatment == "CONTROL") %>% 
   pull(size)
  
+# perform 2-sample t-test
 t.test(x = annual_sample, y = control_sample)
 ```
+
+### Analysis of results:
 
 The mean purple urchin diameter in the annual kelp removal treatment (3.9 cm) is only about 5% higher than the mean urchin diameter in the control treatment (3.7 cm). The results of the t-test show that using a significance level of 0.05, we do not have anough evidence to reject the null hypothesis that these two samples are drawn from populations with the same means. 
 
 The p-value signifies that if the samples were drawn from populations with the same mean size, there is a 25% probability that random sampling would result in means at least as different as the ones we have.
 
+## END
