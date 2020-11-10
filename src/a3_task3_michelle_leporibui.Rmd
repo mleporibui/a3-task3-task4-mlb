@@ -63,7 +63,7 @@ urchins_summary %>%
 ```
 
 Analysis:
-By looking at the plots, we can see that purple urchins tend to be smaller and more uniform in size than red urchins. 
+By looking at the plots, we can see that purple urchins tend to be smaller and more uniform in size than red urchins, which look to be slightly larger on average, have more variation, and a few more large outliers. 
 
 From the summary statistics, we know the mean diameter of purple urchins is roughly 34% lower than red urchins and have a smaller standard deviation. 
 
@@ -107,6 +107,8 @@ ggplot(data = purple_urchins_summary, aes(x = year, y = count)) +
   facet_wrap(~site_full, ncol = 2) +
   theme(legend.position = "none")
 ```
+
+These plots show that at all sites (except Isla Vista Reef, which does not have data from this time period), there were more samples collected between the years 2009-2012, and fewer samples in general in all the years after that. The lowest sampling years for all sites were the first and last recorded, 2008 and 2020 (except for Isla Vista Reef which does not have reported counts for 2008). 
 
 ## END
 
